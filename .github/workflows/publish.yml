@@ -1,0 +1,44 @@
+name: publish
+on:
+  workflow_dispatch:
+  push:
+    # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Must match the PyPI trusted publisher:
+    # https://docs.pypi.org/trusted-publishers/using-a-publisher/
+    environment: publish
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up latest Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: make init
+      - name: Build package
+        run: make build
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          # secrets.GITHUB_TOKEN is provided by GitHub.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: See CHANGELOG.rst
+          draft: false
+          prerelease: false
+      - name: Upload dist/ as workflow artifact (mostly for debugging)
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist

@@ -1,0 +1,32 @@
+# Python stuff
+__pycache__/
+*.py[co]
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+.pytest
+.htmlcov
+coverage.xml
+
+#Translations
+*.mo
+
+# DO include the build folders in examples
+!examples/**/build
